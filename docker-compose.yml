@@ -1,0 +1,20 @@
+version: "3.9"
+services:
+    e131gateway:
+        container_name: e131gateway
+        image: home.shotton.us:5443/e131gateway
+        restart: always
+        ports:
+            - 3131:3000
+        logging:
+            options: 
+                max-size: "10m"
+                max-file: "3"
+        environment: 
+            - TZ=America/New_York
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+            interval: 60s
+            timeout: 10s
+            retries: 5
+    

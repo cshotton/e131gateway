@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+        <title>Matrix Editor</title>
+        <style>
+            .cell {
+                width: 24px;
+                height: 24px;
+                background-color: #808080;
+                margin: 2px;
+            }
+            .cellrow {
+                height:26px;
+            }
+            .matrix {
+                width: 240px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container editor">
+            <div class="matrix" id="matrix"></div>
+            
+            <div class="row">
+                <div class="col">
+                    <input type="color" id="pick" name="pick"
+                    value="#ff0000">
+                    <input type="button" onclick="fillClicked()" value="Fill">
+                    <input type="button" onclick="eraseClicked()" value="Erase">
+                </div>
+            </div>
+        </div>
+    
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+
+        <script>
+            var row_ct = 8;
+            var col_ct = 8;
+            var pickedColor = "#ff0000";
+
+            function matrixClick (x,y) {
+                console.log (`Clicked ${x},${y}`); //JSON.stringify (el,null,4));
+                $(`#cell_${x}_${y}`).css ('background', pickedColor);
+                $.get (`/led/set/${x}/${y}/${pickedColor.slice(1)}`);
+            }
+
+            function doFill (c) {
+                $.get (`/led/fill/${c.slice(1)}`);
+                for (var i=0; i<col_ct; i++) {
+                    for (var j=0; j<row_ct; j++) {
+                        $(`#cell_${i}_${j}`).css ('background', c);
+                    }
+                }
+            }
+
+            function eraseClicked () {
+                doFill ("#000000");
+            }
+
+            function fillClicked () {
+                doFill (pickedColor);
+            }
+
+            function colorPicked (event) {
+                pickedColor = event.target.value;
+                console.log (`color: ${pickedColor}`);
+            }
+
+            $('#pick').on('change', colorPicked);
+            //$('.matrix').on ('click', '.col', matrixClick);
+            
+            var mx = $("#matrix");
+            for (var row=0; row<row_ct; row++) {
+                mx.append ($(`<div class="row matrixrow" id="matrixrow_${row}">`));
+            }
+            for (var row=0; row<row_ct; row++) {
+                mx = $(`#matrixrow_${row}`);
+                for (var col=0; col<col_ct; col++) {
+                    mx.append ($(`<div class="col cell" id="cell_${col}_${row}" onclick="matrixClick(${col},${row})">`));
+                }
+            }
+
+        </script>
+    </body>
+</html>

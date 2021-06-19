@@ -5,4 +5,4 @@ WORKDIR /project
 RUN cd /project \
 	&& npm install
 EXPOSE 3000
-CMD npm run test
+CMD npm start

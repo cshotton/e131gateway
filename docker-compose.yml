@@ -3,9 +3,10 @@ services:
     e131gateway:
         container_name: e131gateway
         image: home.shotton.us:5443/e131gateway
+        network_mode: host
         restart: always
         ports:
-            - 3131:3000
+            - 3131:3131
         logging:
             options: 
                 max-size: "10m"

@@ -29,7 +29,7 @@ function _CalculateGraph (data) {
     }
     let spread = highest-lowest;
     let units = spread / (row_ct-1);
-    console.log (`H:${highest}, L:${lowest}, S:${spread}, U:${units}`);
+//    console.log (`H:${highest}, L:${lowest}, S:${spread}, U:${units}`);
 
     _EraseMatrix ();
 
@@ -50,7 +50,7 @@ function _CalculateGraph (data) {
                 top = Math.round ((data[col][1]-lowest) / units);
             }
 
-            console.log (`col: ${col}, sym: ${sym}, bottom: ${bottom}, top: ${top}`);
+//            console.log (`col: ${col}, sym: ${sym}, bottom: ${bottom}, top: ${top}`);
         
             for (var row=bottom; row<=top; row++) {
                 led.xy (col,(row_ct-1)-row,sym=='+' ? 0x001000 : 0x100000);
@@ -84,7 +84,7 @@ async function _looper () {
     if (exchange.has.fetchOHLCV) {
         var data = await exchange.fetchOHLCV ("BTC/USDT", '1m');
         data = data.slice (data.length-8);
-        console.log (data); // one minute
+//        console.log (data); // one minute
         _CalculateGraph (data);
     }
     else {

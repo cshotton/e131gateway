@@ -24,6 +24,21 @@ const mirror = false;
 var color = 0;
 var idx = 0;
 var frameDelay = cfg.frameDelay; //ms between frame writes
+var invertY = cfg.invertY === true;
+
+function normalizeY(y) {
+    var n = Number(y);
+
+    if (!Number.isFinite(n)) {
+        return y;
+    }
+
+    if (invertY) {
+        return row_ct - n - 1;
+    }
+
+    return n;
+}
 
 function fy (xx, yy) {
     if (rotate_cw) {
@@ -78,8 +93,9 @@ function fill (color) {
 }
 
 function xy (x, y, color) {
-    let yy = fy (x,y) * row_ct * 3;
-    let xx = fx (x,y) * 3;
+    let logicalY = normalizeY(y);
+    let yy = fy (x,logicalY) * row_ct * 3;
+    let xx = fx (x,logicalY) * 3;
 
     let ix = yy+xx;
 //    console.log (`${x}, ${y}, ${color}  - ${xx}, ${yy} = ${ix}`);
@@ -89,8 +105,9 @@ function xy (x, y, color) {
 }
 
 function getxy (x, y) {
-    let yy = fy (x,y) * row_ct * 3;
-    let xx = fx (x,y) * 3;
+    let logicalY = normalizeY(y);
+    let yy = fy (x,logicalY) * row_ct * 3;
+    let xx = fx (x,logicalY) * 3;
 
     let ix = yy+xx;
 //    console.log (`${x}, ${y}, ${color}  - ${xx}, ${yy} = ${ix}`);

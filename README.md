@@ -35,6 +35,12 @@ With options:
 node ./bin/www --matrix matrix.local --delay 50 --candles
 ```
 
+Bottom-left origin mode:
+
+```bash
+node ./bin/www --matrix matrix.local --invert-y
+```
+
 You can also set the HTTP listen port with `PORT`:
 
 ```bash
@@ -48,11 +54,13 @@ PORT=3131 node ./bin/www --matrix matrix.local
 - `--matrix <host>`: E1.31 destination host (default: `matrix.local`)
 - `--delay <ms>`: frame resend cadence in milliseconds, clamped to `10..5000` (default: `100`)
 - `--candles`: enable candle module startup (`runCandles=true`)
+- `--invert-y`: invert the logical Y axis so `0,0` is bottom-left and `7,7` is top-right
 
 Notes:
 
 - Unknown flags are ignored.
 - `--delay` and runtime `setdelay` both use the same clamp range (`10..5000`).
+- Without `--invert-y`, the default logical origin remains top-left.
 
 ## HTTP API
 
@@ -153,9 +161,11 @@ Response shape:
 
 ## Coordinate system and color format
 
-- Coordinates are `x,y` with origin at top-left (`0,0`), `x` increasing to the right, `y` increasing downward.
+- Default coordinates are `x,y` with origin at top-left (`0,0`), `x` increasing to the right, `y` increasing downward.
+- With `--invert-y`, the logical origin becomes bottom-left (`0,0`), with `y` increasing upward.
 - `set` and `fill` routes expect hex color path params in `rrggbb` format.
 - `drawframe` should provide 24-bit integer cell values (`0..16777215`).
+- `getframe` returns the frame in the same logical coordinate mode selected at startup.
 
 ## Notes and limitations
 

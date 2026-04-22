@@ -12,7 +12,8 @@ function parseCliArgs(argv) {
   var out = {
     matrixHost: runtimeConfig.defaults.matrixHost,
     runCandles: runtimeConfig.defaults.runCandles,
-    frameDelay: runtimeConfig.defaults.frameDelay
+    frameDelay: runtimeConfig.defaults.frameDelay,
+    invertY: runtimeConfig.defaults.invertY
   };
 
   for (var i = 0; i < argv.length; i++) {
@@ -23,6 +24,10 @@ function parseCliArgs(argv) {
     }
     if (arg === '--candles') {
       out.runCandles = true;
+      continue;
+    }
+    if (arg === '--invert-y') {
+      out.invertY = true;
       continue;
     }
     if (arg === '--delay' && i + 1 < argv.length) {

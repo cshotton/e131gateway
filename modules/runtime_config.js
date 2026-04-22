@@ -1,7 +1,8 @@
 const defaults = {
     matrixHost: "matrix.local",
     runCandles: false,
-    frameDelay: 100
+    frameDelay: 100,
+    invertY: false
 };
 
 const state = { ...defaults };
@@ -13,6 +14,10 @@ function set(next = {}) {
 
     if (typeof next.runCandles === "boolean") {
         state.runCandles = next.runCandles;
+    }
+
+    if (typeof next.invertY === "boolean") {
+        state.invertY = next.invertY;
     }
 
     if (typeof next.frameDelay !== "undefined") {

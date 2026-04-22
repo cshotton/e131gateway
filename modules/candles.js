@@ -5,6 +5,12 @@ let exchange = new ccxt.binanceus();
 
 const row_ct = 8;
 const col_ct = 8;
+const apiDelay = 6000;
+
+//const palette = [0x800000,0x803200,0x808000,0x004000,0x000080,0x250041,0x774177];
+const palette = [0x101010,0x000000];
+const paletteCt = palette.length;
+let palette_ix = 0;
 
 function _EraseMatrix () {
     led.erase ();
@@ -56,7 +62,9 @@ function _CalculateGraph (data) {
                 led.xy (col,(row_ct-1)-row,sym=='+' ? 0x001000 : 0x100000);
             }
         }
-    }
+        led.xy (0,7, palette [palette_ix]);
+        palette_ix = ++palette_ix % paletteCt;
+}
     catch (err) {
         console.log (`Err: ${err}`);
     }
@@ -79,7 +87,7 @@ async function _looper () {
 //    console.log ("running test 1");
 //    let sleep = (ms) => new Promise (resolve => setTimeout (resolve, ms));
     if (running) {
-        setTimeout (_looper, 60000);
+        setTimeout (_looper, apiDelay);
     }
     if (exchange.has.fetchOHLCV) {
         var data = await exchange.fetchOHLCV ("BTC/USDT", '1m');

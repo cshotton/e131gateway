@@ -1,12 +1,15 @@
 // e131 led functions
 var e131 = require('e131');
+var runtimeConfig = require('./runtime_config');
+
+var cfg = runtimeConfig.get();
  
-var client = new e131.Client('matrix.local');  // or use a universe
+var client = new e131.Client(cfg.matrixHost);  // or use a universe
 var packet = client.createPacket(64*3);  // we want 8 RGB (x3) slots
 var slotsData = packet.getSlotsData();
 packet.setSourceName('test E1.31 client');
 packet.setUniverse(0x01);  // make universe number consistent with the client
-packet.setOption(packet.Options.PREVIEW, true);  // don't really change any fixture
+packet.setOption(packet.Options.PREVIEW, false);  // don't really change any fixture
 packet.setPriority(packet.DEFAULT_PRIORITY);  // not strictly needed, done automatically
  
 // slotsData is a Buffer view, you can use it directly
@@ -20,7 +23,7 @@ const mirror = false;
 
 var color = 0;
 var idx = 0;
-var frameDelay = 100; //ms between frame writes
+var frameDelay = cfg.frameDelay; //ms between frame writes
 
 function fy (xx, yy) {
     if (rotate_cw) {
@@ -116,12 +119,46 @@ function getFrame () {
 }
 
 function setDelay (delay) {
-    frameDelay = delay;
+    const n = Number(delay);
+    if (Number.isFinite(n)) {
+        frameDelay = Math.max(10, Math.min(5000, Math.trunc(n)));
+        nextTickAt = Date.now() + frameDelay;
+    }
+}
+
+let lastTickTime = Date.now();
+let nextTickAt = Date.now() + frameDelay;
+let sendInFlight = false;
+let lastWarnLogTime = 0;
+
+function _scheduleSenderTick () {
+    const wait = Math.max(0, nextTickAt - Date.now());
+    setTimeout(sender, wait);
 }
 
 function sender () {
-    client.send (packet, function () {
-        setTimeout (sender, frameDelay);
+    const now = Date.now();
+    const delta = now - lastTickTime;
+    lastTickTime = now;
+
+    if (delta > (frameDelay + 50) && (now - lastWarnLogTime) > 2000) {
+        console.log(`Warning: frame delay of ${delta}ms exceeds expected ${frameDelay}ms`);
+        lastWarnLogTime = now;
+    }
+
+    nextTickAt += frameDelay;
+    if (nextTickAt < (now - frameDelay * 4)) {
+        nextTickAt = now + frameDelay;
+    }
+    _scheduleSenderTick();
+
+    if (sendInFlight) {
+        return;
+    }
+
+    sendInFlight = true;
+    client.send(packet, function () {
+        sendInFlight = false;
     });
 }
 
@@ -172,7 +209,7 @@ function cycleColor() {
 }
 
 erase ();
-sender ();
+_scheduleSenderTick();
 
 module.exports = {
     xy      : xy,

@@ -4,9 +4,38 @@
  * Module dependencies.
  */
 
-var app = require('../app');
+var runtimeConfig = require('../modules/runtime_config');
 var debug = require('debug')('e131test:server');
 var http = require('http');
+
+function parseCliArgs(argv) {
+  var out = {
+    matrixHost: runtimeConfig.defaults.matrixHost,
+    runCandles: runtimeConfig.defaults.runCandles,
+    frameDelay: runtimeConfig.defaults.frameDelay
+  };
+
+  for (var i = 0; i < argv.length; i++) {
+    var arg = argv[i];
+    if (arg === '--matrix' && i + 1 < argv.length) {
+      out.matrixHost = argv[++i];
+      continue;
+    }
+    if (arg === '--candles') {
+      out.runCandles = true;
+      continue;
+    }
+    if (arg === '--delay' && i + 1 < argv.length) {
+      out.frameDelay = argv[++i];
+      continue;
+    }
+  }
+
+  return out;
+}
+
+runtimeConfig.set(parseCliArgs(process.argv.slice(2)));
+var app = require('../app');
 
 /**
  * Get port from environment and store in Express.

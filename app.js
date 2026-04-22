@@ -8,6 +8,7 @@ var indexRouter = require('./routes/index');
 //var usersRouter = require('./routes/users');
 var ledRouter = require('./routes/led');
 var candles = require ('./modules/candles');
+var runtimeConfig = require('./modules/runtime_config');
 
 var app = express();
 
@@ -40,6 +41,7 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-candles.init (true);
+var cfg = runtimeConfig.get();
+candles.init(cfg.runCandles === true);
 
 module.exports = app;
